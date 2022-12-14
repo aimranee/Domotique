@@ -17,134 +17,22 @@ namespace smart_home
         Form3 form3;
         Panel myPanel;
         Panel b;
+        PictureBox s;
         private Control activeControle;
         List<Panel> panels = new List<Panel>();
-        private CheckBox check;
-        //private static int nbrPanel = 1;
+        private static int nbrPanel = 1;
         private Point previousPoint;
         private List<Device> deviceList;
-        private string nameDevice;
+        public string nameDevice = "aa";
         List<Zone> list;
+        int dev;
+
         public form1()
         {
             InitializeComponent();
             form2 = new Form2(this);
             form3 = new Form3(this);
-            initDevice();
             ComboBox_Load();
-        }
-
-        private void initDevice()
-        {
-            deviceList = DeviceController.afficher();
-            /*foreach (Device item in deviceList)
-            {
-                //MessageBox.Show(item.X1.ToString());
-                myPanel = new Panel();
-                myPanel.Location = new Point(item.X1, item.Y1);
-                myPanel.Size = new Size(64, 64);
-                //myPanel.Text = (panelN).ToString();
-                myPanel.Name = item.Nom;
-                myPanel.BackColor = Color.Transparent;
-                myPanel.Click += b_Click;
-                //changeIcon(myPanel, item.Status);
-                myPanel.BackgroundImageLayout = ImageLayout.Stretch;
-                myPanel.MouseDown += new MouseEventHandler(myPanel_MouseDown);
-                myPanel.MouseMove += new MouseEventHandler(myPanel_MouseMove);
-                myPanel.MouseUp += new MouseEventHandler(myPanel_MMouseUp);
-                pictureBox.Controls.Add(myPanel);
-                //panelN++;
-            }*/
-        }
-        /*private void initFridge()
-        {
-            myPanel = new Panel();
-            myPanel.Location = new Point(530, 500);
-            myPanel.Size = new Size(64, 64);
-            //myPanel.Text = (panelN).ToString();
-            myPanel.Name = string.Format("Fridge1");
-            myPanel.BackColor = Color.Transparent;
-            myPanel.Click += b_Click;
-            //myPanel.BackgroundImage = Properties.Resources.fridge;
-            myPanel.BackgroundImageLayout = ImageLayout.Stretch;
-            myPanel.MouseDown += new MouseEventHandler(myPanel_MouseDown);
-            myPanel.MouseMove += new MouseEventHandler(myPanel_MouseMove);
-            myPanel.MouseUp += new MouseEventHandler(myPanel_MMouseUp);
-            pictureBox.Controls.Add(myPanel);
-
-        }*/
-        /*private void initExitSwitch()
-        {
-            panel7.Click += ExitSwitch;
-        }*/
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            if (!button1.Visible)
-            {
-                //form3.ShowDialog(myPanel.Name);
-                //DialogResult res = form3.ShowDialog();
-
-                /*if (res == DialogResult.OK)
-                {*/
-                form3.ShowDialog();
-                
-                //nbrPanel++;
-                myPanel = new Panel();
-                if (checkBox1.Checked)
-                {
-                    check = checkBox1;
-                    checkBox2.Checked = false;
-                    checkBox3.Checked = false;
-                    checkBox4.Checked = false;
-                    myPanel.Name = form3.Nom;
-                }
-                else if (checkBox2.Checked)
-                {
-                    check = checkBox2;
-                    checkBox1.Checked = false;
-                    checkBox3.Checked = false;
-                    checkBox4.Checked = false;
-                    myPanel.Name = form3.Nom;
-                }
-                else if (checkBox3.Checked)
-                {
-                    check = checkBox3;
-                    checkBox1.Checked = false;
-                    checkBox2.Checked = false;
-                    checkBox4.Checked = false;
-                    myPanel.Name = form3.Nom;
-                }
-                else if (checkBox4.Checked)
-                {
-                    check = checkBox4;
-                    checkBox1.Checked = false;
-                    checkBox2.Checked = false;
-                    checkBox3.Checked = false;
-                    myPanel.Name = form3.Nom;
-                }
-
-                myPanel.Location = new Point(300, 200);
-                myPanel.Size = new Size(48, 48);
-                //myPanel.Text = (nbrPanel).ToString();
-                myPanel.BackColor = Color.Transparent;
-                myPanel.Click += b_Click;
-                myPanel.BackgroundImage = check.Image;
-                myPanel.BackgroundImageLayout = ImageLayout.Stretch;
-                myPanel.MouseDown += new MouseEventHandler(myPanel_MouseDown);
-                myPanel.MouseMove += new MouseEventHandler(myPanel_MouseMove);
-                myPanel.MouseUp += new MouseEventHandler(myPanel_MMouseUp);
-                pictureBox.Controls.Add(myPanel);
-                myPanel.Cursor = Cursors.Hand;
-                panels.Add(myPanel);
-
-                //removeButton.Enabled = true;
-                //}
-            }
-            else
-                MessageBox.Show("Le plan est vide!!\n", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            
-
         }
 
         void b_Click(object sender, EventArgs e)
@@ -153,35 +41,32 @@ namespace smart_home
             if (b != null)
             {
                 button4.Visible = true;
-                MessageBox.Show(b.Name);
+                pictureBox1.Visible = true;
                 nameDevice = b.Name;
-                /*try
-                {
-                    string sql = "datasource=localhost;port=3306;username=root;password=;database=smarthome";
-                    MySqlConnection conn = new MySqlConnection(sql);
 
-                    string selectQuery = "SELECT * FROM device WHERE nom = '" + form3.Nom + "'";
-                    conn.Open();
-                    MySqlCommand command = new MySqlCommand(selectQuery, conn);
-                    MySqlDataReader reader = command.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        //MessageBox.Show(reader.GetString("libelle"));
-                        //comboBox1.Items.Add(reader.GetString("libelle"));
-                        button4.Visible = true;
+                Panel p = panels.Find(r => r.Name == nameDevice);
 
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.Message);
-                }/*
-                //MessageBox.Show(b.Name);
-                //bool exist = homeService.AfficherParIndex(int.Parse(b.Text));
-                /*if (exist == false)
-                    panel6.Visible = true;
+                /*if (p != null)
+                    MessageBox.Show(p.Name);
                 else
-                    checkStatus(b);*/
+                    MessageBox.Show("null");*/
+
+                dev = DeviceController.getStatus(nameDevice);
+                if (dev == 0)
+                {
+                    pictureBox1.Image = Properties.Resources.icons8_off_94;
+                    pictureBox1.Name = "off";
+                }
+                else if (dev == 1)
+                {
+                    pictureBox1.Image = Properties.Resources.icons8_on_94;
+                    pictureBox1.Name = "on";
+
+                }
+                else
+                {
+                    MessageBox.Show("erreur ! \n", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -226,34 +111,6 @@ namespace smart_home
             
         }
 
-        private void checkBox2_CheckedChanged(object sender, EventArgs e)
-        {
-            checkBox1.Checked = false;
-            checkBox4.Checked = false;
-            checkBox3.Checked = false;
-        }
-
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
-        {
-            checkBox2.Checked = false;
-            checkBox4.Checked = false;
-            checkBox3.Checked = false;
-        }
-
-        private void checkBox4_CheckedChanged(object sender, EventArgs e)
-        {
-            checkBox1.Checked = false;
-            checkBox2.Checked = false;
-            checkBox3.Checked = false;
-        }
-
-        private void checkBox3_CheckedChanged(object sender, EventArgs e)
-        {
-            checkBox1.Checked = false;
-            checkBox4.Checked = false;
-            checkBox2.Checked = false;
-        }
-
         private void button3_Click(object sender, EventArgs e)
         {
             if (!button1.Visible)
@@ -263,22 +120,11 @@ namespace smart_home
         }
 
         private void button4_Click(object sender, EventArgs e)
-        {
-            DeviceController.DeleteDevice(nameDevice);
-            MessageBox.Show(panels.Count().ToString());
-/*            if (pictureBox.Controls.Count == deviceList.Count()) button4.Visible = false;
-*/            //pictureBox.Controls.Remove(panels.Last());
-
-            
-            //DeviceController.DeleteDevice(form3.Nom);
+        {            
             Panel p = panels.Find(r => r.Name == nameDevice);
-            MessageBox.Show(p.Name);
             pictureBox.Controls.Remove(p);
             panels.Remove(p);
-            MessageBox.Show(panels.Count().ToString());
-
-            /*panels.RemoveAt(nbrPanel - deviceList.Count());
-            nbrPanel--;*/
+            DeviceController.DeleteDevice(nameDevice);
             button4.Visible = false;
         }
 
@@ -286,10 +132,10 @@ namespace smart_home
         {
 
             if (b.Name.Contains("connection"))
-                b.Image = Properties.Resources.icons8_disconnected_96;
+                b.Image = Properties.Resources.icons8_connected_96;
 
             else if (b.Name.Contains("descon"))
-                b.Image = Properties.Resources.icons8_connected_96;
+                b.Image = Properties.Resources.icons8_disconnected_96;
 
         }
 
@@ -307,7 +153,6 @@ namespace smart_home
                 MySqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
                 {
-                    //MessageBox.Show(reader.GetString("libelle"));
                     list.Add(new Zone(Int32.Parse(reader.GetString("id")), reader.GetString("libelle")));
                     comboBox1.Items.Add(reader.GetString("libelle"));
                 }
@@ -327,10 +172,11 @@ namespace smart_home
                 int s = ZoneController.getStatus(zn.Id);
                 if (s == 0)
                 {
-                    connection.Image = Properties.Resources.icons8_connected_96;
+                    connection.Image = Properties.Resources.icons8_disconnected_96;
                     DialogResult dialogClose = MessageBox.Show("Vous voulez connecter la zone "+ zn.Libelle + "!!", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
                     if (dialogClose == DialogResult.OK)
                     {
+                        
                         ZoneController.Update(zn.Id, 1);
                         changeIconConn(connection);
                         connection.Name = "descon";
@@ -338,7 +184,7 @@ namespace smart_home
                 }
                 else
                 {
-                    connection.Image = Properties.Resources.icons8_disconnected_96;
+                    connection.Image = Properties.Resources.icons8_connected_96;
                     DialogResult dialogClose = MessageBox.Show("Vous voulez deconnecter cette zone !!", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
                     if (dialogClose == DialogResult.OK)
                     {
@@ -365,12 +211,12 @@ namespace smart_home
                 connection.Visible = true;
                 if (s == 0)
                 {
-                    connection.Image = Properties.Resources.icons8_connected_96;
+                    connection.Image = Properties.Resources.icons8_disconnected_96;
                     connection.Name = "connection";
                 }
                 else if (s == 1)
                 {
-                    connection.Image = Properties.Resources.icons8_disconnected_96;
+                    connection.Image = Properties.Resources.icons8_connected_96;
                     connection.Name = "descon";
                     
                 }
@@ -384,5 +230,138 @@ namespace smart_home
                 MessageBox.Show("choisi la zone ! \n", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            if (pictureBox1.Name == "off")
+            {
+                DialogResult dialogClose = MessageBox.Show("Vous voules ouvrire cette device !!", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                if (dialogClose == DialogResult.OK)
+                {
+                    pictureBox1.Name = "on";
+                    pictureBox1.Image = Properties.Resources.icons8_on_94;
+                    DeviceController.UpdateStatusByName(nameDevice, 1);
+                    if (nameDevice.Contains("door"))
+                        b.BackgroundImage = Properties.Resources.icons8_open_door_40;
+                    else if (nameDevice.Contains("clima"))
+                        b.BackgroundImage = Properties.Resources.icons8_air_conditioner_64;
+                    else if (b.Name.Contains("light"))
+                        b.BackgroundImage = Properties.Resources.icons8_light_on_48;
+                    else if (b.Name.Contains("refr"))
+                        b.BackgroundImage = Properties.Resources.icons8_fridge_64;
+                }
+            }
+            else if (pictureBox1.Name == "on")
+            {
+                DialogResult dialogClose = MessageBox.Show("Vous voules arreter cette device !!", "", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+                if (dialogClose == DialogResult.OK)
+                {
+                    pictureBox1.Name = "off";
+                    pictureBox1.Image = Properties.Resources.icons8_off_94;
+                    DeviceController.UpdateStatusByName(nameDevice, 0);
+                   
+                    if (b.Name.Contains("door")) b.BackgroundImage = Properties.Resources.icons8_door_closed_40;
+                    else if (b.Name.Contains("clima")) b.BackgroundImage = Properties.Resources.icons8_air_conditioner_64_off;
+                    else if (b.Name.Contains("light")) b.BackgroundImage = Properties.Resources.icons8_light_off_80;
+                    else if (b.Name.Contains("refr")) b.BackgroundImage = Properties.Resources.icons8_fridge_64__1_;
+
+                }
+            }
+        }
+
+        private void pictureBox_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.Bitmap))
+            {
+                e.Effect = DragDropEffects.Copy;
+            }
+        }
+
+        private void pictureBox_DragLeave(object sender, EventArgs e)
+        {
+
+        }
+
+        private void form1_Load(object sender, EventArgs e)
+        {
+            pictureBox.AllowDrop = true;
+        }
+
+        private void clima_MouseDown(object sender, MouseEventArgs e)
+        {
+            ((PictureBox)sender).DoDragDrop(((PictureBox)sender).Image, DragDropEffects.Copy);
+            s = sender as PictureBox;
+            if (s != null)
+            {
+                nameDevice = s.Name;
+                //MessageBox.Show(nameDevice);
+            }
+        }
+
+        private void door_MouseDown(object sender, MouseEventArgs e)
+        {
+            s = sender as PictureBox;
+            if (s != null)
+            {
+                nameDevice = s.Name;
+                //MessageBox.Show(nameDevice);
+            }
+            ((PictureBox)sender).DoDragDrop(((PictureBox)sender).Image, DragDropEffects.Copy);
+            
+        }
+
+        private void refr_MouseDown(object sender, MouseEventArgs e)
+        {
+            s = sender as PictureBox;
+            if (s != null)
+            {
+                nameDevice = s.Name;
+                //MessageBox.Show(nameDevice);
+            }
+            ((PictureBox)sender).DoDragDrop(((PictureBox)sender).Image, DragDropEffects.Copy);
+            
+        }
+
+        private void light_MouseDown(object sender, MouseEventArgs e)
+        {
+            s = sender as PictureBox;
+            if (s != null)
+            {
+                nameDevice = s.Name;
+                //MessageBox.Show(nameDevice);
+            }
+            ((PictureBox)sender).DoDragDrop(((PictureBox)sender).Image, DragDropEffects.Copy);
+            
+        }
+
+        private void pictureBox_DragDrop(object sender, DragEventArgs e)
+        {
+            if (!button1.Visible)
+            {
+                
+                    Image getPic = (Bitmap)e.Data.GetData(DataFormats.Bitmap);
+                    myPanel = new Panel();
+                    form3.Name = nameDevice;
+                    form3.ShowDialog();
+                    myPanel.Name = form3.Nom;
+                    myPanel.Location = new Point(300, 200);
+                    myPanel.Size = new Size(48, 48);
+                    myPanel.BackColor = Color.Transparent;
+                    myPanel.Click += b_Click;
+                    myPanel.BackgroundImage = getPic;
+                    myPanel.BackgroundImageLayout = ImageLayout.Stretch;
+                    myPanel.MouseDown += new MouseEventHandler(myPanel_MouseDown);
+                    myPanel.MouseMove += new MouseEventHandler(myPanel_MouseMove);
+                    myPanel.MouseUp += new MouseEventHandler(myPanel_MMouseUp);
+                    pictureBox.Controls.Add(myPanel);
+                    myPanel.Cursor = Cursors.Hand;
+                    panels.Add(myPanel);
+                
+            }
+            else
+                MessageBox.Show("Le plan est vide!!\n", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        
     }
 }

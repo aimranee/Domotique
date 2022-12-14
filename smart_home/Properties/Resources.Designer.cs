@@ -153,6 +153,26 @@ namespace smart_home.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap icons8_off_94 {
+            get {
+                object obj = ResourceManager.GetObject("icons8-off-94", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap icons8_on_94 {
+            get {
+                object obj = ResourceManager.GetObject("icons8-on-94", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap icons8_open_door_40 {
             get {
                 object obj = ResourceManager.GetObject("icons8-open-door-40", resourceCulture);

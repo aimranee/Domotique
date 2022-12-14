@@ -17,6 +17,7 @@ namespace smart_home
     public partial class Form3 : Form
     {
         private readonly form1 _prunt;
+        //form1 form = new form1();
         List<Zone> list;
         private string nom;
 
@@ -27,6 +28,7 @@ namespace smart_home
             InitializeComponent();
             this._prunt = prunt;
             ComboBox_Load();
+            //form = new form1();
         }
 
         private void ComboBox_Load()
@@ -58,12 +60,13 @@ namespace smart_home
         {
             //MessageBox.Showl(_prunt.Name);
             DateTime theDate = DateTime.Now;
-            
-            nom = textBox1.Text + theDate.ToString("yyyy-MM-dd H:mm:ss");
+
+            Nom = Name + theDate.ToString("yyyy-MM-dd H:mm:ss");
+            //MessageBox.Show(Nom);
             if (comboBox1.SelectedItem != null)
             {
                 Zone zn = list.Find(x => x.Libelle == comboBox1.SelectedItem.ToString());
-                DeviceController.Ajouter(textBox1.Text, zn.Id, theDate, 0,0);
+                DeviceController.Ajouter(textBox1.Text, Nom, zn.Id, theDate);
                 textBox1.Clear();
                 Close();
             }
