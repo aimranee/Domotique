@@ -13,8 +13,8 @@ namespace smart_home.Models
         private string nom;
         private int status;
         private int zoneId;
-        private int X;
-        private int Y;
+        private int x;
+        private int y;
 
         public Device(int id, string libelle, string nom, int status, int zoneId, int x, int y)
         {
@@ -23,24 +23,24 @@ namespace smart_home.Models
             this.nom = nom;
             this.status = status;
             this.zoneId = zoneId;
-            this.X = x;
-            this.Y = y;
+            this.x = x;
+            this.y = y;
         }
 
         public Device(string libelle, int zoneId, int x, int y)
         {
             this.libelle = libelle;
             this.zoneId = zoneId;
-            this.X = x;
-            this.Y = y;
+            this.x = x;
+            this.y = y;
         }
 
         public int Id { get => id; set => id = value; }
         public string Libelle { get => libelle; set => libelle = value; }
         public int ZoneId { get => zoneId; set => zoneId = value; }
         public int Status { get => status; set => status = value; }
-        public int X1 { get => X; set => X = value; }
-        public int Y1 { get => Y; set => Y = value; }
         public string Nom { get => nom; set => nom = value; }
+        public int X { get => x; set => x = value; }
+        public int Y { get => y; set => y = value; }
     }
 }

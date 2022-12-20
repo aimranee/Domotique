@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Linq;
 using System.Runtime.Remoting.Contexts;
 using System.Windows.Forms;
+using static Google.Protobuf.Reflection.SourceCodeInfo.Types;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace smart_home
@@ -23,9 +24,10 @@ namespace smart_home
         private static int nbrPanel = 1;
         private Point previousPoint;
         private List<Device> deviceList;
-        public string nameDevice = "aa";
+        public string nameDevice = "null";
         List<Zone> list;
         int dev;
+        private int x, y;
 
         public form1()
         {
@@ -33,6 +35,48 @@ namespace smart_home
             form2 = new Form2(this);
             form3 = new Form3(this);
             ComboBox_Load();
+            
+        }
+
+        private void initCapt()
+        {
+            deviceList = DeviceController.afficher();
+            foreach (Device item in deviceList)
+            {
+                myPanel = new Panel();
+                myPanel.Location = new Point(item.X, item.Y);
+                myPanel.Size = new Size(64, 64);
+                myPanel.Text = (nbrPanel).ToString();
+                myPanel.Name = item.Nom;
+                myPanel.BackColor = Color.Transparent;
+                //myPanel.Paint += new PaintEventHandler(myPanel_Paint);
+                myPanel.Click += b_Click;
+                if (item.Status == 0)
+                {
+                    pictureBox1.Name = "off";
+                    pictureBox1.Image = Properties.Resources.icons8_off_94;
+
+                    if (item.Nom.Contains("door")) myPanel.BackgroundImage = Properties.Resources.icons8_door_closed_40;
+                    else if (item.Nom.Contains("clima")) myPanel.BackgroundImage = Properties.Resources.icons8_air_conditioner_64_off;
+                    else if (item.Nom.Contains("light")) myPanel.BackgroundImage = Properties.Resources.icons8_light_off_80;
+                    else if (item.Nom.Contains("refr")) myPanel.BackgroundImage = Properties.Resources.icons8_fridge_64__1_;
+                } else {
+                    pictureBox1.Name = "on";
+                    pictureBox1.Image = Properties.Resources.icons8_on_94;
+
+                    if (nameDevice.Contains("door")) myPanel.BackgroundImage = Properties.Resources.icons8_open_door_40;
+                    else if (nameDevice.Contains("clima")) myPanel.BackgroundImage = Properties.Resources.icons8_air_conditioner_64;
+                    else if (item.Nom.Contains("light")) myPanel.BackgroundImage = Properties.Resources.icons8_light_on_48;
+                    else if (item.Nom.Contains("refr")) myPanel.BackgroundImage = Properties.Resources.icons8_fridge_64;
+                }
+                //changeIcon(myPanel, item.Status);
+                myPanel.BackgroundImageLayout = ImageLayout.Stretch;
+                myPanel.MouseDown += new MouseEventHandler(myPanel_MouseDown);
+                myPanel.MouseMove += new MouseEventHandler(myPanel_MouseMove);
+                myPanel.MouseUp += new MouseEventHandler(myPanel_MMouseUp);
+                pictureBox.Controls.Add(myPanel);
+                nbrPanel++;
+            }
         }
 
         void b_Click(object sender, EventArgs e)
@@ -86,6 +130,8 @@ namespace smart_home
             var location = activeControle.Location;
             location.Offset(e.Location.X - previousPoint.X, e.Location.Y - previousPoint.Y);
             activeControle.Location = location;
+            x = activeControle.Location.X;
+            y = activeControle.Location.Y;
         }
 
         private void myPanel_MouseDown(object sender, MouseEventArgs e)
@@ -93,6 +139,7 @@ namespace smart_home
             activeControle = sender as Control;
             previousPoint = e.Location;
             Cursor = Cursors.Hand;
+            button5.Visible = true;
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -104,6 +151,7 @@ namespace smart_home
             {
                 pictureBox.Image = Image.FromFile(filePath);
                 button1.Visible = false;
+                initCapt();
             }
             catch
             {  
@@ -113,8 +161,11 @@ namespace smart_home
 
         private void button3_Click(object sender, EventArgs e)
         {
-            if (!button1.Visible)
-            form2.ShowDialog();
+            if (!button1.Visible && !button5.Visible)
+            {
+
+            }
+            //form2.ShowDialog();
             else
                 MessageBox.Show("Le plan est vide!!\n", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
@@ -336,32 +387,92 @@ namespace smart_home
 
         private void pictureBox_DragDrop(object sender, DragEventArgs e)
         {
-            if (!button1.Visible)
+            if (!button1.Visible && !button5.Visible)
             {
                 
-                    Image getPic = (Bitmap)e.Data.GetData(DataFormats.Bitmap);
-                    myPanel = new Panel();
-                    form3.Name = nameDevice;
-                    form3.ShowDialog();
-                    myPanel.Name = form3.Nom;
-                    myPanel.Location = new Point(300, 200);
-                    myPanel.Size = new Size(48, 48);
-                    myPanel.BackColor = Color.Transparent;
-                    myPanel.Click += b_Click;
-                    myPanel.BackgroundImage = getPic;
-                    myPanel.BackgroundImageLayout = ImageLayout.Stretch;
-                    myPanel.MouseDown += new MouseEventHandler(myPanel_MouseDown);
-                    myPanel.MouseMove += new MouseEventHandler(myPanel_MouseMove);
-                    myPanel.MouseUp += new MouseEventHandler(myPanel_MMouseUp);
-                    pictureBox.Controls.Add(myPanel);
-                    myPanel.Cursor = Cursors.Hand;
-                    panels.Add(myPanel);
-                
+                Image getPic = (Bitmap)e.Data.GetData(DataFormats.Bitmap);
+
+                myPanel = new Panel();
+                form3.Name = nameDevice;
+                form3.ShowDialog();
+                myPanel.Name = form3.Nom;
+                myPanel.Location = new Point(300, 200);
+                myPanel.Size = new Size(48, 48);
+                myPanel.BackColor = Color.Transparent;
+                myPanel.Click += b_Click;
+
+                myPanel.BackgroundImage = getPic;
+                myPanel.BackgroundImageLayout = ImageLayout.Stretch;
+                myPanel.MouseDown += new MouseEventHandler(myPanel_MouseDown);
+                myPanel.MouseMove += new MouseEventHandler(myPanel_MouseMove);
+                myPanel.MouseUp += new MouseEventHandler(myPanel_MMouseUp);
+                pictureBox.Controls.Add(myPanel);
+                myPanel.Cursor = Cursors.Hand;
+                panels.Add(myPanel);
+                button5.Visible = true;
+
+
             }
             else
                 MessageBox.Show("Le plan est vide!!\n", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
-        
+        private void button5_Click(object sender, EventArgs e)
+        {
+            //String n = "";
+            Point locationOnForm = b.FindForm().PointToClient(b.Parent.PointToScreen(b.Location));
+
+            DialogResult dialogClose = MessageBox.Show("Do you Want To Add This " + b.Name, "", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+
+            if (dialogClose == DialogResult.OK)
+            {
+                /*if (locationOnForm.X > 47 && locationOnForm.X < 250 && locationOnForm.Y < 290)
+                    n = "Zone1";
+                else if (locationOnForm.X > 250 && locationOnForm.X < 410 && locationOnForm.Y < 219)
+                    n = "Zone2";
+                else if (locationOnForm.X > 480 && locationOnForm.X < 650 && locationOnForm.Y < 380)
+                    n = "Zone3";
+                else if (locationOnForm.X > 230 && locationOnForm.X < 470 && locationOnForm.Y > 500)
+                    n = "Zone4";
+                else if (locationOnForm.X > 220 && locationOnForm.X < 260 && locationOnForm.Y > 370)
+                    n = "Zone5";
+                else if (locationOnForm.X > 28 && locationOnForm.X < 210 && locationOnForm.Y > 370)
+                    n = "Zone6";*/
+                MessageBox.Show((x) + "  " + (y));
+                DeviceController.UpdateLocation(x, y, b.Name);
+                button5.Visible = false;
+            }
+            else if (dialogClose == DialogResult.Cancel)
+            {
+                pictureBox.Controls.Remove(panels.Last());
+                panels.RemoveAt(nbrPanel - 2);
+                nbrPanel--;
+                button5.Visible = false;
+            }
+        }
+
+        private void clima_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void myPanel_Paint(object sender, PaintEventArgs e)
+        {
+            var p = sender as Panel;
+            var g = e.Graphics;
+
+            g.FillRectangle(new SolidBrush(Color.FromArgb(0, Color.Black)), p.DisplayRectangle);
+
+            Point[] points = new Point[4];
+
+            points[0] = new Point(0, 0);
+            points[1] = new Point(0, p.Height);
+            points[2] = new Point(p.Width, p.Height);
+            points[3] = new Point(p.Width, 0);
+
+            Brush brush = new SolidBrush(Color.DarkGreen);
+
+            g.FillPolygon(brush, points);
+        }
     }
 }

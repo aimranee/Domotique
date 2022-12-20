@@ -105,6 +105,7 @@
             this.clima.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize;
             this.clima.TabIndex = 17;
             this.clima.TabStop = false;
+            this.clima.Click += new System.EventHandler(this.clima_Click);
             this.clima.MouseDown += new System.Windows.Forms.MouseEventHandler(this.clima_MouseDown);
             // 
             // door
@@ -128,6 +129,7 @@
             this.button5.Text = "Enregistre";
             this.button5.UseVisualStyleBackColor = true;
             this.button5.Visible = false;
+            this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // button4
             // 

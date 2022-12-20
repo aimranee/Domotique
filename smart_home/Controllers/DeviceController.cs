@@ -66,7 +66,7 @@ namespace smart_home.Controllers
             con.Close();
         }
 
-        /*public static List<Device> afficher()
+        public static List<Device> afficher()
         {
             List<Device> deviceList = new List<Device>();
             string sql = "SELECT * from device";
@@ -86,7 +86,7 @@ namespace smart_home.Controllers
 
             con.Close();
             return deviceList;
-        }*/
+        }
 
         public static void UpdateStatus(int id, int st)
         {
@@ -109,6 +109,24 @@ namespace smart_home.Controllers
         public static void UpdateStatusByName(string name, int st)
         {
             string sql = "UPDATE device SET statut = " + st + " WHERE nom = '" + name + "'";
+            MySqlConnection con = GetConnection();
+            MySqlCommand cmd = new MySqlCommand(sql, con);
+            cmd.CommandType = CommandType.Text;
+            try
+            {
+                cmd.ExecuteNonQuery();
+                //MessageBox.Show("Le device est modifie avec success.", "InformationError", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show("La device n'est pas modifie.\n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            con.Close();
+        }
+
+        public static void UpdateLocation(int x, int y, string name)
+        {
+            string sql = "UPDATE device SET X = " + x + " , Y = "+ y +" WHERE nom = '" + name + "'";
             MySqlConnection con = GetConnection();
             MySqlCommand cmd = new MySqlCommand(sql, con);
             cmd.CommandType = CommandType.Text;
