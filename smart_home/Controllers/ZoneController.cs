@@ -1,8 +1,11 @@
 ﻿using MySql.Data.MySqlClient;
+using smart_home.Models;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Management;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 
 namespace smart_home.Controllers
@@ -25,12 +28,12 @@ namespace smart_home.Controllers
             return conn;
         }
 
-        public static void Ajouter(string libelle)
+        public static void Ajouter(string libelle, string nom, int x, int y, int w, int h)
         {
             DateTime theDate = DateTime.Now;
             theDate.ToString("yyyy-MM-dd H:mm:ss");
             MySqlConnection conn = GetConnection();
-            string LoadData = "insert into zone(libelle,dateCreation,dateUpdate) values('" + libelle + "','" + theDate.ToString("yyyy-MM-dd H:mm:ss") + "','" + theDate.ToString("yyyy-MM-dd H:mm:ss") + "');";
+            string LoadData = "insert into zone(libelle,nom,x,y,w,h,dateCreation,dateUpdate) values('" + libelle + "','" + nom +"','" + x +"','" + y +"','" + w +"','" + h +"','" + theDate.ToString("yyyy-MM-dd H:mm:ss") + "','" + theDate.ToString("yyyy-MM-dd H:mm:ss") + "');";
             MySqlCommand cmd = new MySqlCommand(LoadData, conn);
             try
             {
@@ -75,10 +78,10 @@ namespace smart_home.Controllers
             con.Close();
         }
 
-        public static int getStatus(int id)
+        public static int getStatus(string s)
         {
             int n = 2;
-            string sql = "SELECT status FROM zone WHERE id = "+id;
+            string sql = "SELECT status FROM zone WHERE nom = '"+ s +"'";
             MySqlConnection con = GetConnection();
             MySqlCommand cmd = new MySqlCommand(sql, con);
             
@@ -90,10 +93,53 @@ namespace smart_home.Controllers
                     n = Int32.Parse(reader.GetString("status"));
                 }
             }catch{
-                MessageBox.Show("La zone n'est pas modifie.\n", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Erreur.\n", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             return n;
         }
 
+        public static List<Zone> afficher()
+        {
+            List<Zone> zoneList = new List<Zone>();
+            string sql = "SELECT * from zone";
+            MySqlConnection con = GetConnection();
+            MySqlCommand cmd = new MySqlCommand(sql, con);
+            cmd.CommandType = CommandType.Text;
+            try
+            {
+                MySqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                    zoneList.Add(new Zone(int.Parse(reader["id"].ToString()), reader["libelle"].ToString(), reader["nom"].ToString(), int.Parse(reader["status"].ToString()), int.Parse(reader["x"].ToString()), int.Parse(reader["y"].ToString()), int.Parse(reader["w"].ToString()), int.Parse(reader["h"].ToString())));
+            }
+            catch (MySqlException ex)
+            {
+                MessageBox.Show("Device not deleted. \n" + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            con.Close();
+            return zoneList;
+        }
+
+        public static Zone getIdByName(int id)
+        {
+            Zone d = null;
+            string sql = "SELECT * FROM zone WHERE id = '" + id + "'";
+            MySqlConnection con = GetConnection();
+            MySqlCommand cmd = new MySqlCommand(sql, con);
+
+            try
+            {
+                MySqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    d = new Zone (Int32.Parse(reader.GetString("id")), reader.GetString("libelle"), reader.GetString("nom"), Int32.Parse(reader.GetString("x")), Int32.Parse(reader.GetString("y")), Int32.Parse(reader.GetString("w")), Int32.Parse(reader.GetString("h")), Int32.Parse(reader.GetString("status")));
+                }
+            }
+            catch
+            {
+                MessageBox.Show("La zone n'est pas modifie.\n", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            return d;
+        }
     }
 }

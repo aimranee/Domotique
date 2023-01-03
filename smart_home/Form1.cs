@@ -16,25 +16,38 @@ namespace smart_home
     {
         Form2 form2;
         Form3 form3;
+        Form4 form4;
         Panel myPanel;
         Panel b;
+        
+        enum DrawKind { RESIZABLERECTANGLE };
         PictureBox s;
         private Control activeControle;
         List<Panel> panels = new List<Panel>();
+        List<PictureBox> zones = new List<PictureBox>();
         private static int nbrPanel = 1;
+        private static int nbrZone = 1;
         private Point previousPoint;
         private List<Device> deviceList;
+        private List<Zone> zoneList;
         public string nameDevice = "null";
-        List<Zone> list;
+        public string nameZone = "null";
         int dev;
         private int x, y;
+        bool flagMouseDown = false;
+        int x1, y1, x2, y2;
+        Bitmap bmp1;
+        //List<Zone> list;
+        Graphics g;
+        //DrawKind drawkind = DrawKind.RESIZABLERECTANGLE;
+        Pen pen;
 
         public form1()
         {
             InitializeComponent();
             form2 = new Form2(this);
             form3 = new Form3(this);
-            ComboBox_Load();
+            form4 = new Form4(this);
             
         }
 
@@ -79,6 +92,74 @@ namespace smart_home
             }
         }
 
+        private void initZone()
+        {
+            zoneList = ZoneController.afficher();
+            foreach (Zone item in zoneList)
+            {
+                s = new PictureBox();
+                s.Location = new Point(item.Y, item.X);
+                s.Size = new Size(item.H, item.W);
+                //myPanel.Text = (nbrZone).ToString();
+                s.Name = item.Nom;
+                s.BackColor = Color.Transparent;
+                s.BorderStyle = BorderStyle.FixedSingle;
+                s.Click += s_Click;
+                /*if (item.Status == 0)
+                {
+                    connection.Image = Properties.Resources.icons8_connected_96;
+                    connection.Name = "descon";
+                }
+                else
+                {
+                    connection.Image = Properties.Resources.icons8_disconnected_96;
+                    connection.Name = "connection";
+
+                }*/
+                s.DragDrop += new DragEventHandler(panel_DragDrop);
+                s.DragEnter += new DragEventHandler(panel_DragEnter);
+                s.DragOver += new DragEventHandler(panel_DragLeave);
+                s.AllowDrop = true;
+                pictureBox.Controls.Add(s);
+                nbrZone++;
+            }
+        }
+
+        void s_Click(object sender, EventArgs e)
+        {
+            s = sender as PictureBox;
+            if (s != null)
+            {
+                connection.Visible = true;
+                //pictureBox1.Visible = true;
+                nameZone = s.Name;
+                PictureBox p = zones.Find(r => r.Name == nameZone);
+
+                /*if (p != null)
+                    MessageBox.Show(p.Name);
+                else
+                    MessageBox.Show("null");*/
+                
+                dev = ZoneController.getStatus(nameZone);
+
+                if (dev == 0)
+                {
+                    pictureBox1.Image = Properties.Resources.icons8_connected_96;
+                    pictureBox1.Name = "connection";
+                }
+                else if (dev == 1)
+                {
+                    pictureBox1.Image = Properties.Resources.icons8_disconnected_96;
+                    pictureBox1.Name = "descon";
+
+                }
+                else
+                {
+                    MessageBox.Show("erreur ! \n", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+        }
+
         void b_Click(object sender, EventArgs e)
         {
             b = sender as Panel;
@@ -96,6 +177,7 @@ namespace smart_home
                     MessageBox.Show("null");*/
 
                 dev = DeviceController.getStatus(nameDevice);
+
                 if (dev == 0)
                 {
                     pictureBox1.Image = Properties.Resources.icons8_off_94;
@@ -151,7 +233,9 @@ namespace smart_home
             {
                 pictureBox.Image = Image.FromFile(filePath);
                 button1.Visible = false;
-                initCapt();
+                //initZone();
+                //initCapt();
+                
             }
             catch
             {  
@@ -161,13 +245,14 @@ namespace smart_home
 
         private void button3_Click(object sender, EventArgs e)
         {
-            if (!button1.Visible && !button5.Visible)
-            {
+             //if (!button1.Visible && !button5.Visible)
+            //{
+                button3.Enabled = false;
 
-            }
+            //}
             //form2.ShowDialog();
-            else
-                MessageBox.Show("Le plan est vide!!\n", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            //else
+              //  MessageBox.Show("Le plan est vide!!\n", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -190,37 +275,13 @@ namespace smart_home
 
         }
 
-        private void ComboBox_Load()
-        {
-            list = new List<Zone>();
-            try
-            {
-                string sql = "datasource=localhost;port=3306;username=root;password=;database=smarthome";
-                MySqlConnection conn = new MySqlConnection(sql);
-
-                string selectQuery = "SELECT * FROM zone";
-                conn.Open();
-                MySqlCommand command = new MySqlCommand(selectQuery, conn);
-                MySqlDataReader reader = command.ExecuteReader();
-                while (reader.Read())
-                {
-                    list.Add(new Zone(Int32.Parse(reader.GetString("id")), reader.GetString("libelle")));
-                    comboBox1.Items.Add(reader.GetString("libelle"));
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
-        }
+        
 
         private void connection_Click(object sender, EventArgs e)
         {
 
-            if (comboBox1.SelectedItem != null)
-            {
-                Zone zn = list.Find(x => x.Libelle == comboBox1.SelectedItem.ToString());
-                int s = ZoneController.getStatus(zn.Id);
+                Zone zn = zoneList.Find(x => x.Nom == nameZone);
+                int s = ZoneController.getStatus(zn.Nom);
                 if (s == 0)
                 {
                     connection.Image = Properties.Resources.icons8_disconnected_96;
@@ -245,41 +306,8 @@ namespace smart_home
                         connection.Name = "connection";
                     }
                 }
-            }
-            else
-            {
-                MessageBox.Show("choisi la zone ! \n", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-                                  
-        }
 
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (comboBox1.SelectedItem != null)
-            {
-                Zone zn = list.Find(x => x.Libelle == comboBox1.SelectedItem.ToString());
-                int s = ZoneController.getStatus(zn.Id);
-                connection.Visible = true;
-                if (s == 0)
-                {
-                    connection.Image = Properties.Resources.icons8_disconnected_96;
-                    connection.Name = "connection";
-                }
-                else if (s == 1)
-                {
-                    connection.Image = Properties.Resources.icons8_connected_96;
-                    connection.Name = "descon";
-                    
-                }
-                else
-                {
-                    MessageBox.Show("choisi la zone ! \n", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-            }
-            else
-            {
-                MessageBox.Show("choisi la zone ! \n", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+                                  
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
@@ -320,21 +348,25 @@ namespace smart_home
             }
         }
 
-        private void pictureBox_DragEnter(object sender, DragEventArgs e)
+        private void panel_DragEnter(object sender, DragEventArgs e)
         {
+           // MessageBox.Show("heerre");
             if (e.Data.GetDataPresent(DataFormats.Bitmap))
             {
                 e.Effect = DragDropEffects.Copy;
             }
         }
 
-        private void pictureBox_DragLeave(object sender, EventArgs e)
+        private void panel_DragLeave(object sender, EventArgs e)
         {
 
         }
 
         private void form1_Load(object sender, EventArgs e)
         {
+            pen = new Pen(Color.Black, 2);
+            pen.DashStyle = System.Drawing.Drawing2D.DashStyle.Dash;
+            pictureBox.Image = new Bitmap(pictureBox.Width, pictureBox.Height);
             pictureBox.AllowDrop = true;
         }
 
@@ -385,7 +417,7 @@ namespace smart_home
             
         }
 
-        private void pictureBox_DragDrop(object sender, DragEventArgs e)
+        private void panel_DragDrop(object sender, DragEventArgs e)
         {
             if (!button1.Visible && !button5.Visible)
             {
@@ -394,51 +426,123 @@ namespace smart_home
 
                 myPanel = new Panel();
                 form3.Name = nameDevice;
+                form3.NomZ = nameZone;
                 form3.ShowDialog();
+                
                 myPanel.Name = form3.Nom;
-                myPanel.Location = new Point(300, 200);
+                myPanel.Location = new Point(0,0);
                 myPanel.Size = new Size(48, 48);
                 myPanel.BackColor = Color.Transparent;
                 myPanel.Click += b_Click;
-
                 myPanel.BackgroundImage = getPic;
                 myPanel.BackgroundImageLayout = ImageLayout.Stretch;
                 myPanel.MouseDown += new MouseEventHandler(myPanel_MouseDown);
                 myPanel.MouseMove += new MouseEventHandler(myPanel_MouseMove);
                 myPanel.MouseUp += new MouseEventHandler(myPanel_MMouseUp);
-                pictureBox.Controls.Add(myPanel);
+                PictureBox p = zones.Find(r => r.Name == form3.Zn.Nom);
+                p.Controls.Add(myPanel);
                 myPanel.Cursor = Cursors.Hand;
                 panels.Add(myPanel);
                 button5.Visible = true;
-
-
             }
             else
-                MessageBox.Show("Le plan est vide!!\n", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+              MessageBox.Show("Le plan est vide!!\n", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+
         }
+
+        private void pictureBox_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (!button3.Enabled)
+            {
+                x1 = e.X;
+                y1 = e.Y;
+                flagMouseDown = true;
+            }
+        }
+
+        private void pictureBox_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (!button3.Enabled)
+            {
+                if (flagMouseDown == true)
+                {
+                    x2 = e.X;
+                    y2 = e.Y;
+                    pictureBox.Refresh();
+
+                    bmp1 = new Bitmap(pictureBox.Image);
+                    g = Graphics.FromImage(bmp1);
+                }
+            }
+        }
+
+        private void pictureBox_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (!button3.Enabled)
+            {
+                bmp1 = new Bitmap(pictureBox.Image);
+                g = Graphics.FromImage(bmp1);
+                s = new PictureBox();
+                int w, h;
+
+                w = Math.Abs(x2 - x1);
+                h = Math.Abs(y2 - y1);
+
+                //MessageBox.Show(w + "  " + h);
+
+                g.DrawRectangle(pen, x1, y1, w, h);
+                pictureBox.Image = bmp1;
+
+                g.Dispose();
+                pictureBox.Image = bmp1;
+                flagMouseDown = false;
+                pictureBox.Cursor = Cursors.Default;
+                form4.X = x1;
+                form4.Y = y1;
+                form4.W = w;
+                form4.H = h;
+                form4.ShowDialog();
+                
+                //form3.Name = nameDevice;
+                //form3.ShowDialog();
+                s.Name = form4.Nom;
+                s.Location = new Point(form4.X, form4.Y);
+                //MessageBox.Show(form4.X + "    " + form4.Y);
+                s.Size = new Size(w, h);
+                s.BackColor = Color.Transparent;
+                s.Click += s_Click;
+                s.BorderStyle = BorderStyle.Fixed3D;
+                s.DragDrop += new DragEventHandler(panel_DragDrop);
+                s.DragEnter += new DragEventHandler(panel_DragEnter);
+                s.DragLeave += new EventHandler(panel_DragLeave);
+                s.AllowDrop = true;
+                pictureBox.Controls.Add(s);
+                s.Cursor = Cursors.Hand;
+                nbrZone++;
+                zones.Add(s);
+                //zoneList.Add(form4.Z);
+                form3.ComboBox_Load();
+                button3.Enabled = true;
+                
+            }
+
+        }
+
+        /*private void pictureBox_MouseLeave(object sender, EventArgs e)
+        {
+            
+        }*/
 
         private void button5_Click(object sender, EventArgs e)
         {
-            //String n = "";
             Point locationOnForm = b.FindForm().PointToClient(b.Parent.PointToScreen(b.Location));
 
             DialogResult dialogClose = MessageBox.Show("Do you Want To Add This " + b.Name, "", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
 
             if (dialogClose == DialogResult.OK)
             {
-                /*if (locationOnForm.X > 47 && locationOnForm.X < 250 && locationOnForm.Y < 290)
-                    n = "Zone1";
-                else if (locationOnForm.X > 250 && locationOnForm.X < 410 && locationOnForm.Y < 219)
-                    n = "Zone2";
-                else if (locationOnForm.X > 480 && locationOnForm.X < 650 && locationOnForm.Y < 380)
-                    n = "Zone3";
-                else if (locationOnForm.X > 230 && locationOnForm.X < 470 && locationOnForm.Y > 500)
-                    n = "Zone4";
-                else if (locationOnForm.X > 220 && locationOnForm.X < 260 && locationOnForm.Y > 370)
-                    n = "Zone5";
-                else if (locationOnForm.X > 28 && locationOnForm.X < 210 && locationOnForm.Y > 370)
-                    n = "Zone6";*/
-                MessageBox.Show((x) + "  " + (y));
+                //MessageBox.Show((x) + "  " + (y));
                 DeviceController.UpdateLocation(x, y, b.Name);
                 button5.Visible = false;
             }
@@ -451,9 +555,21 @@ namespace smart_home
             }
         }
 
-        private void clima_Click(object sender, EventArgs e)
+        private void pictureBox_Paint(object sender, PaintEventArgs e)
         {
-
+            if (!button1.Visible)
+            {
+                if (flagMouseDown == true)
+                {
+                    int w, h;
+                    w = Math.Abs(x2 - x1);
+                    h = Math.Abs(y2 - y1);
+                    
+                    e.Graphics.DrawRectangle(pen, x1, y1, w, h);
+                    
+                }
+            }
+            
         }
 
         private void myPanel_Paint(object sender, PaintEventArgs e)

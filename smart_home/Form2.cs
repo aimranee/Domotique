@@ -79,7 +79,7 @@ namespace smart_home
                 if (!string.IsNullOrEmpty(textBoxs[i].Text))
                 {
                     //MessageBox.Show(DateTime.Now.ToString("dd/MM/yyyy"));
-                    ZoneController.Ajouter(textBoxs[i].Text);
+                    //ZoneController.Ajouter(textBoxs[i].Text);
                     n++;
                 }
             }

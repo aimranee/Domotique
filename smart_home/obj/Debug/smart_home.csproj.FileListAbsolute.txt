@@ -34,3 +34,4 @@ C:\Users\aimra\source\repos\smart_home\smart_home\bin\Debug\System.Runtime.Compi
 C:\Users\aimra\source\repos\smart_home\smart_home\obj\Debug\smart_home.Form2.resources
 C:\Users\aimra\source\repos\smart_home\smart_home\obj\Debug\smart_home.csproj.CopyComplete
 C:\Users\aimra\source\repos\smart_home\smart_home\obj\Debug\smart_home.Form3.resources
+C:\Users\aimra\source\repos\smart_home\smart_home\obj\Debug\smart_home.Form4.resources
